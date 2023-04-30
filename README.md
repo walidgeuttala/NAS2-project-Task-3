@@ -14,18 +14,9 @@ I display for each pair of models the heatmap and save the information about the
 
 ### requirement 
 
-You must install pretrainedmodels library and fix ssl unverified context
-
+You must install the requirement libraries 
 ```python
-!pip install pretrainedmodels
-import ssl
-import urllib.request
-
-# Disable SSL verification
-ssl._create_default_https_context = ssl._create_unverified_context
-
-# Access the website
-response = urllib.request.urlopen("https://www.example.com")
+!pip install -r requirements.txt
 ```
 
 ### command line parameters 
