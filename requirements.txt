@@ -1,0 +1,4 @@
+pretrainedmodels
+lbry-libtorrent
+wget
+torf

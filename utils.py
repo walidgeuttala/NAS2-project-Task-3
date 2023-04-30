@@ -48,7 +48,8 @@ def import_dataloader(args, model_name, i):
     # Load the full dataset
     dataset = getattr(torchvision.datasets, args.dataset)
     if args.dataset == "ImageNet":
-        train_dataset = torchvision.datasets.ImageFolder(root='./data/', transform=transform)
+        download_validation_ImagenNet(args)
+        train_dataset = torchvision.datasets.ImageFolder(root='./data', transform=transform)
         dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False)
     else:
         train_dataset = dataset(root='./data', train=True, download=True, transform=transform)
@@ -178,25 +179,14 @@ def heatmap_plot(args, CKA_matrix, i):
     # Display the plot
     plt.show()
     
-def install_pretrainedmodels():
+def unverified_context():
 
-    subprocess.check_call(['pip', 'install', 'pretrainedmodels'])
     ssl._create_default_https_context = ssl._create_unverified_context
     response = urllib.request.urlopen("https://www.example.com")
-
-
-def install_ImageNet_libraries():
-
-    subprocess.run(["pip", "install", "--upgrade", "pip", "setuptools", "wheel"])
-    subprocess.run(["pip", "install", "lbry-libtorrent", "wget", "torf"])
-    subprocess.run(["apt", "install", "python3-libtorrent"])
-
 
 def download_validation_ImagenNet(args):
 
     if not os.path.exists('./Torrent/ILSVRC2012_img_val.tar'):
-        print('walid')
-        return
         params = {
             'save_path': './Torrent/',
             'storage_mode': lt.storage_mode_t(2),

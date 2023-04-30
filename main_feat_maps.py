@@ -96,7 +96,6 @@ def main():
         cka = CKA()
     
     if args.dataset == "ImageNet" and not os.path.exists('./data/valid'):
-        install_ImageNet_libraries()
         download_validation_ImagenNet(args)
     for i in range(args.length):
         
@@ -124,8 +123,7 @@ def main():
 if __name__ == "__main__":
     
     args = parse_args()
-    if args.torchvision == 0:
-        install_pretrainedmodels()
+    unverified_context()
     with open(args.output, 'w') as f:
         f.write(str(args))
     main()
