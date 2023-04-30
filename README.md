@@ -28,7 +28,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 response = urllib.request.urlopen("https://www.example.com")
 ```
 
-### command line paramters 
+### command line parameters 
 
 Note : the main file called : main_feat_maps.py
 
