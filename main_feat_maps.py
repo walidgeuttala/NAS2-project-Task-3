@@ -19,9 +19,9 @@ import itertools
 def parse_args():
 
     parser = argparse.ArgumentParser(description="helps for extracting CKA feature maps")
-    parser.add_argument("--dataset", type=str, default="CIFAR10", help="choose dataset")
-    parser.add_argument("--batch_size", type=int, default=5, help="batch size")
-    parser.add_argument("--dataloader_size", type=int, default=2, help="dataloader size")
+    parser.add_argument("--dataset", type=str, default="ImageNet", help="choose dataset")
+    parser.add_argument("--batch_size", type=int, default=1, help="batch size")
+    parser.add_argument("--dataloader_size", type=int, default=1, help="dataloader size")
     parser.add_argument("--torchvision", type=int, default=0, help="use torchvision library or pretrainedmodels")
     parser.add_argument("--pretrained", type=int, nargs='+', default=[1], help="pretrained 1 or 0")
     parser.add_argument("--device", type=int, default=0, help="device id, -1 for cpu")
