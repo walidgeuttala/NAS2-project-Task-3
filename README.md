@@ -1,5 +1,5 @@
-# Feature Maps using CKA
-============================
+# Feature map similarity for model layers using CKA
+# =================================================
 
 Key words : 
 > NAS, hidden feature maps, CKA, heatmap
