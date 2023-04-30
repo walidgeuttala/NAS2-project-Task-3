@@ -78,7 +78,7 @@ Note : the main file called : main_feat_maps.py
 !python3 main_feat_maps.py --models_names resnet18 resnet34 --layers_depth -1 --compare_all 1 --conv_only 1 --remove_output_layer 0 --batch_size 150 --dataloader_size 4
 ```
 
-![Alt text](./images/"conv_only resnet18 vs resnet18.png" "conv_only resnet18 vs resnet18")
+<img src="./images/conv_only resnet18 vs resnet18.png" alt="Alt text" title="conv_only resnet18 vs resnet18">
 
 
 
