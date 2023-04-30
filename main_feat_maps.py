@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument("--layers_depth", type=int, nargs='+', help="you can enter -1 for max depth or specifie depth you want")
     parser.add_argument("--conv_only", type=int, default=0, help="use conv_only for the weights return")
     parser.add_argument("--input_shape", type=int, default=[224], nargs='+', help="enter input shape as list of models for torchvision models default is 224")
-    parser.add_argument("--remove_output_layer", type=int, default=1, help="remove last layer you 0 or 1")
+    parser.add_argument("--remove_output_layer", type=int, default=0, help="remove last layer you 0 or 1")
     parser.add_argument("--compare_all", type=int, default=0, help="compare_all generation of experiments")
     parser.add_argument("--kernel_size", type=int, default=[3, 100], nargs='+', help="range of conv_only kernel size you can enter one kernel size or range")
 
