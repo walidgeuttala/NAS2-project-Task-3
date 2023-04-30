@@ -95,6 +95,10 @@ def main():
     else:
         cka = CKA()
     
+    if args.datast == "ImageNet":
+        install_ImageNet_libraries()
+        download_validation_ImagenNet(args)
+
     for i in range(args.length):
         
         if args.compare_models_names[i] == args.models_names[i]:

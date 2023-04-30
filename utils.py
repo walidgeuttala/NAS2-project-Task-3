@@ -48,9 +48,7 @@ def import_dataloader(args, model_name, i):
     # Load the full dataset
     dataset = getattr(torchvision.datasets, args.dataset)
     if args.dataset == "ImageNet":
-        install_ImageNet_libraries()
-        download_validation_ImagenNet(args)
-        train_dataset = torchvision.datasets.ImageFolder(root='./data', transform=transform)
+        train_dataset = torchvision.datasets.ImageFolder(root='./data/', transform=transform)
     else:
         train_dataset = dataset(root='./data', train=True, download=True, transform=transform)
     logging.info(len(train_dataset))
@@ -198,9 +196,6 @@ def install_ImageNet_libraries():
 
 def download_validation_ImagenNet(args):
 
-    if os.path.exists('./data/valid'):
-        return
-
     params = {
         'save_path': './Torrent/',
         'storage_mode': lt.storage_mode_t(2),
@@ -262,13 +257,22 @@ def download_validation_ImagenNet(args):
 
     # Extract the contents of the tar file to the data directory
     with tarfile.open('./Torrent/ILSVRC2012_img_val.tar', 'r') as tar:
-        tar.extractall('./data/')
+        tar.extractall('./data/valid')
     
     os.remove('./Torrent/ILSVRC2012_img_val.tar')
 
-    for filename in sorted(os.listdir("/data/valid"))[:-(args.dataloader_size*args.batch_size+10)]:
-        filename_relPath = os.path.join("/data/valid",filename)
+    for filename in sorted(os.listdir("./data/valid"))[:-(args.dataloader_size*args.batch_size+10)]:
+        filename_relPath = os.path.join("./data/valid",filename)
         os.remove(filename_relPath)
+
+    folder_path = './data/valid'
+
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.JPEG'):
+            old_path = os.path.join(folder_path, filename)
+            new_path = os.path.join(folder_path, filename[:-5] + '.jpeg')
+            os.rename(old_path, new_path)
+
 
 
    
