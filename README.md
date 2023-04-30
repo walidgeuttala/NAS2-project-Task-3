@@ -80,6 +80,10 @@ Note : the main file called : main_feat_maps.py
 
 <img src="./images/conv_only resnet18 vs resnet18.png" alt="Alt text" title="conv_only resnet18 vs resnet18">
 
+<img src="./images/conv_only resnet34 vs resnet18.png" alt="Alt text" title="conv_only resnet18 vs resnet18">
+
+<img src="./images/conv_only resnet34 vs resnet34.png" alt="Alt text" title="conv_only resnet18 vs resnet18">
+
 
 
 
