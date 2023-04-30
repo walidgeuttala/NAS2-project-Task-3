@@ -12,6 +12,14 @@ import pretrainedmodels
 import subprocess
 import ssl
 import urllib.request
+import os
+import tarfile
+import zipfile
+import os
+import libtorrent as lt
+import time
+import datetime
+import shutil
 
 def set_random_seed(seed=0):
     random.seed(seed)
@@ -39,7 +47,12 @@ def import_dataloader(args, model_name, i):
 
     # Load the full dataset
     dataset = getattr(torchvision.datasets, args.dataset)
-    train_dataset = dataset(root='./data', train=True, download=True, transform=transform)
+    if args.dataset == "ImageNet":
+        install_ImageNet_libraries()
+        download_validation_ImagenNet(args)
+        train_dataset = torchvision.datasets.ImageFolder(root='./data', transform=transform)
+    else:
+        train_dataset = dataset(root='./data', train=True, download=True, transform=transform)
     logging.info(len(train_dataset))
 
     # Select a subset of the data
@@ -174,5 +187,88 @@ def install_pretrainedmodels():
     subprocess.check_call(['pip', 'install', 'pretrainedmodels'])
     ssl._create_default_https_context = ssl._create_unverified_context
     response = urllib.request.urlopen("https://www.example.com")
+
+
+def install_ImageNet_libraries():
+
+    subprocess.run(["pip", "install", "--upgrade", "pip", "setuptools", "wheel"])
+    subprocess.run(["pip", "install", "lbry-libtorrent", "wget", "torf"])
+    subprocess.run(["apt", "install", "python3-libtorrent"])
+
+
+def download_validation_ImagenNet(args):
+
+    if os.path.exists('./data/valid'):
+        return
+
+    params = {
+        'save_path': './Torrent/',
+        'storage_mode': lt.storage_mode_t(2),
+    }
+
+    ses = lt.session()
+    ses.listen_on(6881, 6891)
+    link = "magnet:?xt=urn:btih:5d6d0df7ed81efd49ca99ea4737e0ae5e3a5f2e5&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce"
+
+    if link.endswith('.torrent'):
+        import wget
+        from torf import Torrent
+
+        if os.path.exists('torrent.torrent'):
+            os.remove('torrent.torrent')
+
+        wget.download(link, 'torrent.torrent')
+        t = Torrent.read('torrent.torrent')
+        link = str(t.magnet(name=True, size=False, trackers=False, tracker=False))
+
+
+    logging.info(link)
+    handle = lt.add_magnet_uri(ses, link, params)
+    # change the 0 to a 1 to download sequentially
+    handle.set_sequential_download(0)
+    ses.start_dht()
+    begin = time.time()
+
+    logging.info(datetime.datetime.now())
+    logging.info('Downloading Metadata...')
+
+    while not handle.has_metadata():
+        time.sleep(1)
+
+    logging.info('Got Metadata, Starting Torrent Download...')
+    logging.info("Starting", handle.name())
+
+    while handle.status().state != lt.torrent_status.seeding:
+        s = handle.status()
+        state_str = ['queued', 'checking', 'downloading metadata',
+                    'downloading', 'finished', 'seeding', 'allocating']
+        logging.info('%.2f%% complete (down: %.1f kb/s up: %.1f kB/s peers: %d) %s ' %
+            (s.progress * 100, s.download_rate / 1000, s.upload_rate / 1000,
+            s.num_peers, state_str[s.state]))
+        time.sleep(5)
+
+    end = time.time()
+    logging.info(handle.name(), "COMPLETE")
+    logging.info("Elapsed Time: ", int((end - begin) // 60), "min :", int((end - begin) % 60), "sec")
+    logging.info(datetime.datetime.now())
+
+
+    # Create the data directory if it does not exist
+    if not os.path.exists('data'):
+        os.mkdir('data')
+
+    if not os.path.exists('./data/valid'):
+        os.mkdir('./data/valid')
+
+    # Extract the contents of the tar file to the data directory
+    with tarfile.open('./Torrent/ILSVRC2012_img_val.tar', 'r') as tar:
+        tar.extractall('./data/')
+    
+    os.remove('./Torrent/ILSVRC2012_img_val.tar')
+
+    for filename in sorted(os.listdir("/data/valid"))[:-(args.dataloader_size*args.batch_size+10)]:
+        filename_relPath = os.path.join("/data/valid",filename)
+        os.remove(filename_relPath)
+
 
    
