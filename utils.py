@@ -179,10 +179,6 @@ def heatmap_plot(args, CKA_matrix, i):
     # Display the plot
     plt.show()
     
-def unverified_context():
-
-    ssl._create_default_https_context = ssl._create_unverified_context
-    response = urllib.request.urlopen("https://www.example.com")
 
 def download_validation_ImagenNet(args):
 

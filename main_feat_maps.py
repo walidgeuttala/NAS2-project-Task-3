@@ -123,7 +123,10 @@ def main():
 if __name__ == "__main__":
     
     args = parse_args()
-    unverified_context()
+    
+    ssl._create_default_https_context = ssl._create_unverified_context
+    response = urllib.request.urlopen("https://www.example.com")
+
     with open(args.output, 'w') as f:
         f.write(str(args))
     main()
