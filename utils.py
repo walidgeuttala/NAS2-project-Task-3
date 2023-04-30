@@ -158,7 +158,7 @@ def find_feature_maps_for_model(args, model_name, i, dataloader):
 def heatmap_plot(args, CKA_matrix, i):
 
     # Create a heatmap using seaborn
-    ax = sns.heatmap(CKA_matrix, cbar=False)
+    ax = sns.heatmap(CKA_matrix) #cbar=False
     ax.invert_yaxis()
     string = f"depth {args.layers_depth[i]} "
     if args.conv_only == 1:
