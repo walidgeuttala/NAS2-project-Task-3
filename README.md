@@ -64,7 +64,7 @@ Note : the main file called : main_feat_maps.py
 
 - `--conv_only` type=int, default=0, help="use conv_only 1 or use all layers 0", Note="used only when the `--layers_depth -1`"
 
-- `--remove_output_layer` type=int, default=1, help="remove last layer from representation of matrix of CKA used only when `--conv_ony 0`, meaning we have softmax or any type last layer that we don't want it in CKA presentation"
+- `--remove_output_layer` type=int, default=1, help="remove last layer from representation of matrix of CKA used only when `--conv_only 0`, meaning we have softmax or any type last layer that we don't want it in CKA presentation"
 
 - `--compare_all` type=int, default=0, help="compare_all generation of nCr where r = 2, used to make comparsing of all choises of 2 models between the list"
 > if we have list of (`--models_names` and `--layers_depth`) the we generaete all cobimantion of `--models_names` (`--models_names vgg16 resnet18`) will be [vgg16 vgg16 resnet18] and this generated list will be combined with all possible choices with `--output_path` list
@@ -72,6 +72,13 @@ Note : the main file called : main_feat_maps.py
 - `--kernel_size` type=int, default=[3, 100], nargs='+', help="range of conv_only kernel size you can enter one kernel size or range", Note="used only when `--conv_only 1`"
 
 
+### example
+ 
+```python
+!python3 main_feat_maps.py --models_names resnet18 resnet34 --layers_depth -1 --compare_all 1 --conv_only 1 --remove_output_layer 0 --batch_size 150 --dataloader_size 4
+```
+
+![Alt text]("./outupt/to/conv_only resnet18 vs resnet18.png" "conv_only resnet18 vs resnet18")
 
 
 
