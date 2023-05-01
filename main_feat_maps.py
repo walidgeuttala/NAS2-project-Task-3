@@ -75,7 +75,7 @@ def parse_args():
     if args.compare_models_names == None:
         args.compare_models_names = args.models_names
 
-
+    args.output_path = "./"+args.output_path
     # paths
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path)
