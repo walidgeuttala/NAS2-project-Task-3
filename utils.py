@@ -50,14 +50,14 @@ def import_dataloader(args, model_name, i):
     if args.dataset == "ImageNet":
         download_validation_ImagenNet(args)
         train_dataset = torchvision.datasets.ImageFolder(root='./data', transform=transform)
-        dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False)
+        dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False, num_workers=2)
     else:
         train_dataset = dataset(root='./data', train=True, download=True, transform=transform)
         # Select a subset of the data
         subset_indices = list(range(0, args.batch_size*2*args.dataloader_size, 2))
         subset = Subset(train_dataset, subset_indices)
         # Create a dataloader for the subset
-        dataloader = DataLoader(subset, batch_size=args.batch_size, shuffle=False)
+        dataloader = DataLoader(subset, batch_size=args.batch_size, shuffle=False, num_workers=2)
     
     return dataloader
 
@@ -89,18 +89,18 @@ def avarage_output_feat_maps_dataloader(output):
 
 
 def run_CKA(args, cka, mean_output, remove_output_layer=1): 
-    
-    # if args.conv_only == 1:
-    #     mean_output = list(filter(lambda x: len(list(x.shape)) == 4, mean_output))
 
     CKA_matrix = torch.zeros((len(mean_output)-remove_output_layer, len(mean_output)-remove_output_layer), dtype=float)
     logging.info(CKA_matrix.shape)
 
     for i in range(CKA_matrix.shape[0]):
-        if len(list(mean_output[i].shape)) == 4:
-            mean_output[i] = torch.mean(mean_output[i], axis=(1, 2))
-        elif len(list(mean_output[i].shape)) == 3:
-            mean_output[i] = torch.mean(mean_output[i], axis=(1))
+        if args.flatten == 1:
+            mean_output[i] = mean_output[i].flatten(1)
+        else:
+            if len(list(mean_output[i].shape)) == 4:
+                mean_output[i] = torch.mean(mean_output[i], axis=(2, 3))
+            elif len(list(mean_output[i].shape)) == 3:
+                mean_output[i] = torch.mean(mean_output[i], axis=(2))
     
     for i in range(CKA_matrix.shape[0]):
         for j in  range(CKA_matrix.shape[0]):
@@ -113,24 +113,26 @@ def run_CKA(args, cka, mean_output, remove_output_layer=1):
 
 def run_CKA_diff(args, cka, mean_output, mean_output2, remove_output_layer=1): 
 
-    # if args.conv_only == 1:
-    #     mean_output = list(filter(lambda x: len(list(x.shape)) == 4, mean_output))
-    #     mean_output2 = list(filter(lambda x: len(list(x.shape)) == 4, mean_output2))
-
     CKA_matrix = torch.zeros((len(mean_output)-remove_output_layer, len(mean_output2)-remove_output_layer), dtype=float)
     logging.info(CKA_matrix.shape)
 
     for i in range(CKA_matrix.shape[0]):
-        if len(list(mean_output[i].shape)) == 4:
-            mean_output[i] = torch.mean(mean_output[i], axis=(1, 2))
-        elif len(list(mean_output[i].shape)) == 3:
-            mean_output[i] = torch.mean(mean_output[i], axis=(1))
+        if args.flatten == 1:
+            mean_output[i] = mean_output[i].flatten(1)
+        else:
+            if len(list(mean_output[i].shape)) == 4:
+                mean_output[i] = torch.mean(mean_output[i], axis=(2, 3))
+            elif len(list(mean_output[i].shape)) == 3:
+                mean_output[i] = torch.mean(mean_output[i], axis=(2))
 
     for i in range(CKA_matrix.shape[1]):
-        if len(list(mean_output2[i].shape)) == 4:
-            mean_output2[i] = torch.mean(mean_output2[i], axis=(1, 2))
-        elif len(list(mean_output2[i].shape)) == 3:
-            mean_output2[i] = torch.mean(mean_output2[i], axis=(1))
+        if args.flatten == 1:
+            mean_output2[i] = mean_output2[i].flatten(1)
+        else:
+            if len(list(mean_output2[i].shape)) == 4:
+                mean_output2[i] = torch.mean(mean_output2[i], axis=(2, 3))
+            elif len(list(mean_output2[i].shape)) == 3:
+                mean_output2[i] = torch.mean(mean_output2[i], axis=(2))
 
     for i in range(CKA_matrix.shape[0]):
         for j in  range(CKA_matrix.shape[1]):
@@ -138,33 +140,27 @@ def run_CKA_diff(args, cka, mean_output, mean_output2, remove_output_layer=1):
                 CKA_matrix[i][j] = cka.kernel_CKA(mean_output[i], mean_output2[j])
             else:
                 CKA_matrix[i][j] = cka.linear_CKA(mean_output[i], mean_output2[j])
-            
-            # if j<CKA_matrix.shape[0] and i<CKA_matrix.shape[1]:
-            #     CKA_matrix[j][i] = CKA_matrix[i][j]
 
     return CKA_matrix
 
 def find_feature_maps_for_model(args, model_name, i, dataloader):
-    
     if args.torchvision == 1:
         model_path = getattr(torchvision.models, model_name)
-        model = model_path(pretrained=args.pretrained[i]).to(args.device)
+        model = model_path().to(args.device)
     else:
         model = pretrainedmodels.__dict__[model_name](num_classes=1000, pretrained='imagenet').to(args.device)
-
+        model.eval()
     model_utils = ModelUtils(model, args.device, args.layers_depth[i], args.conv_only, args.kernel_size)
     if model_utils.max_layer_depth < args.layers_depth[i]:
         logging.warning(f'out of range layer depth for model with index {i} named : {model_name}')
-
     output = model_utils.get_feature_maps_dataloader_for_all_layers(dataloader)
     logging.info(len(output))
-    if args.dataloader_size != 1:
-        output = avarage_output_feat_maps_dataloader(output)
-    else:
-        output = output[0]
+    # if args.dataloader_size != 1:
+    #     output = avarage_output_feat_maps_dataloader(output)
+    # else:
+    #     output = output[0]
 
     del model
-    
     return output
 
 def heatmap_plot(args, CKA_matrix, i):

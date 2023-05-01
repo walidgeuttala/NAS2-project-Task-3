@@ -1,5 +1,6 @@
 import numpy as np
 import re
+import torch
 
 class ModelUtils(object):
 
@@ -124,7 +125,7 @@ class ModelUtils(object):
         for X, y in dataloader: 
           out = self.model(X.to(self.device))
           feat_maps_list.append(activation[module_str])
-
+          
         # detach the hooks
         h.remove()
 
@@ -151,13 +152,19 @@ class ModelUtils(object):
           
           layers_hooks.append(module.register_forward_hook(getActivation(module_str)))
 
-        # forward pass -- getting the outputs
-        feat_maps_list = []
+        feat_maps_list = None
         # forward pass -- getting the outputs
         for X, y in dataloader: 
-          out = self.model(X.to(self.device))
-          feat_maps_list.append(list(activation.values()))
-          del out
+          _ = self.model(X.to(self.device))
+          if feat_maps_list == None:
+            feat_maps_list = list(activation.values())
+          else:
+            values = list(activation.values())
+            for i in range(len(feat_maps_list)):
+              feat_maps_list[i] += values[i]
+        print(len(dataloader))
+        for i in range(len(feat_maps_list)):
+          feat_maps_list[i] /= len(dataloader)
         # detach the hooks
         for h in layers_hooks:
           h.remove()

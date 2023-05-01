@@ -35,6 +35,7 @@ def parse_args():
     parser.add_argument("--remove_output_layer", type=int, default=0, help="remove last layer you 0 or 1")
     parser.add_argument("--compare_all", type=int, default=0, help="compare_all generation of experiments")
     parser.add_argument("--kernel_size", type=int, default=[3, 100], nargs='+', help="range of conv_only kernel size you can enter one kernel size or range")
+    parser.add_argument("--flatten", type=int, default=0, help="use flatten with no losing info about CKA or 0 means use kernel average")
 
     args = parser.parse_args()
 
