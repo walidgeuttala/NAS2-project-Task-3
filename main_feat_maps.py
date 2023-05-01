@@ -23,6 +23,7 @@ def parse_args():
     parser.add_argument("--batch_size", type=int, default=128, help="batch size")
     parser.add_argument("--dataloader_size", type=int, default=1, help="dataloader size")
     parser.add_argument("--torchvision", type=int, default=0, help="use torchvision library or pretrainedmodels")
+    parser.add_argument("--pretrained", type=int, nargs='+', default=[1], help="pretrained 1 or 0")
     parser.add_argument("--device", type=int, default=0, help="device id, -1 for cpu")
     parser.add_argument("--models_names",type=str, nargs='+', help="model architectures you can enter one name model or list of models")
     parser.add_argument("--compare_models_names",type=str, default=None, nargs='+', help="model architectures vs who to compare with you can enter one name model or list of models",)
