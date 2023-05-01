@@ -12,8 +12,6 @@ from utils import *
 from model_utils import ModelUtils
 import itertools
 
-# !python3 main_feat_maps.py --models_names resnet18 resnet34 --layers_depth -1 --compare_all 1 --conv_only 1 --kernel_size 3 --remove_output_layer 0 --batch_size 50 --dataloader_size 2
-# pnasnet5large, nasnetalarge, senet154, polynet, inceptionresnetv2 
 
 
 def parse_args():
