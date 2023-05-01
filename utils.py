@@ -56,7 +56,6 @@ def import_dataloader(args, model_name, i):
         # Select a subset of the data
         subset_indices = list(range(0, args.batch_size*2*args.dataloader_size, 2))
         subset = Subset(train_dataset, subset_indices)
-
         # Create a dataloader for the subset
         dataloader = DataLoader(subset, batch_size=args.batch_size, shuffle=False)
     
@@ -159,7 +158,10 @@ def find_feature_maps_for_model(args, model_name, i, dataloader):
 
     output = model_utils.get_feature_maps_dataloader_for_all_layers(dataloader)
     logging.info(len(output))
-    output = avarage_output_feat_maps_dataloader(output)
+    if args.dataloader_size != 1:
+        output = avarage_output_feat_maps_dataloader(output)
+    else:
+        output = output[0]
 
     del model
     
@@ -168,7 +170,7 @@ def find_feature_maps_for_model(args, model_name, i, dataloader):
 def heatmap_plot(args, CKA_matrix, i):
 
     # Create a heatmap using seaborn
-    ax = sns.heatmap(CKA_matrix) #cbar=False
+    ax = sns.heatmap(CKA_matrix, vmin=0, vmax=1) #cbar=False
     ax.invert_yaxis()
     string = f"depth {args.layers_depth[i]} "
     if args.conv_only == 1:
@@ -245,10 +247,8 @@ def download_validation_ImagenNet(args):
     # Extract the contents of the tar file to the data directory
     with tarfile.open('./Torrent/ILSVRC2012_img_val.tar', 'r') as tar:
         tar.extractall('./data/valid')
-    
-    os.remove('./Torrent/ILSVRC2012_img_val.tar')
 
-    for filename in sorted(os.listdir("./data/valid"))[:-(args.dataloader_size*args.batch_size+10)]:
+    for filename in sorted(os.listdir("./data/valid"))[:-(args.dataloader_size*args.batch_size)]:
         filename_relPath = os.path.join("./data/valid",filename)
         os.remove(filename_relPath)
 

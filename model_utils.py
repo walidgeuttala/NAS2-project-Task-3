@@ -130,7 +130,7 @@ class ModelUtils(object):
 
         return feat_maps_list
 
-
+    
     def get_feature_maps_dataloader_for_all_layers(self, dataloader):
 
         # a dict to store the activations
