@@ -162,7 +162,7 @@ class ModelUtils(object):
             values = list(activation.values())
             for i in range(len(feat_maps_list)):
               feat_maps_list[i] += values[i]
-        print(len(dataloader))
+        
         for i in range(len(feat_maps_list)):
           feat_maps_list[i] /= len(dataloader)
         # detach the hooks
