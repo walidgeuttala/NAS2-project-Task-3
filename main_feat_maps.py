@@ -20,10 +20,9 @@ def parse_args():
 
     parser = argparse.ArgumentParser(description="helps for extracting CKA feature maps")
     parser.add_argument("--dataset", type=str, default="ImageNet", help="choose dataset")
-    parser.add_argument("--batch_size", type=int, default=10, help="batch size")
+    parser.add_argument("--batch_size", type=int, default=128, help="batch size")
     parser.add_argument("--dataloader_size", type=int, default=1, help="dataloader size")
     parser.add_argument("--torchvision", type=int, default=0, help="use torchvision library or pretrainedmodels")
-    parser.add_argument("--pretrained", type=int, nargs='+', default=[1], help="pretrained 1 or 0")
     parser.add_argument("--device", type=int, default=0, help="device id, -1 for cpu")
     parser.add_argument("--models_names",type=str, nargs='+', help="model architectures you can enter one name model or list of models")
     parser.add_argument("--compare_models_names",type=str, default=None, nargs='+', help="model architectures vs who to compare with you can enter one name model or list of models",)
@@ -35,7 +34,7 @@ def parse_args():
     parser.add_argument("--remove_output_layer", type=int, default=0, help="remove last layer you 0 or 1")
     parser.add_argument("--compare_all", type=int, default=0, help="compare_all generation of experiments")
     parser.add_argument("--kernel_size", type=int, default=[3, 100], nargs='+', help="range of conv_only kernel size you can enter one kernel size or range")
-    parser.add_argument("--flatten", type=int, default=0, help="use flatten with no losing info about CKA or 0 means use kernel average")
+    parser.add_argument("--flatten", type=int, default=1, help="use flatten with no losing info about CKA or 0 means use kernel average")
 
     args = parser.parse_args()
 
