@@ -159,9 +159,10 @@ class ModelUtils(object):
           if feat_maps_list == None:
             feat_maps_list = list(activation.values())
           else:
-            values = list(activation.values())
+            activation = list(activation.values())
             for i in range(len(feat_maps_list)):
-              feat_maps_list[i] += values[i]
+              feat_maps_list[i].add_(activation[i])
+          activation = {}
         
         for i in range(len(feat_maps_list)):
           feat_maps_list[i] /= len(dataloader)

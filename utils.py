@@ -171,9 +171,9 @@ def heatmap_plot(args, CKA_matrix, i):
     string = f"depth {args.layers_depth[i]} "
     if args.conv_only == 1:
         string = "conv_only "
-    title = string+f"{args.compare_models_names[i]} vs {args.models_names[i]}.png"    
+    title = string+f"{args.compare_models_names[i]} vs {args.models_names[i]}"    
     plt.title(title)
-    plt.savefig(args.output_path+"/"+title, bbox_inches='tight')
+    plt.savefig(args.output_path+"/"+title+".png", bbox_inches='tight')
     # Display the plot
     plt.show()
     
@@ -237,8 +237,9 @@ def download_validation_ImagenNet(args):
     if not os.path.exists('data'):
         os.mkdir('data')
 
-    if not os.path.exists('./data/valid'):
-        os.mkdir('./data/valid')
+    if os.path.exists('./data/valid'):
+        shutil. rmtree('./data/valid')
+    os.mkdir('./data/valid')
 
     # Extract the contents of the tar file to the data directory
     with tarfile.open('./Torrent/ILSVRC2012_img_val.tar', 'r') as tar:
