@@ -25,7 +25,7 @@ def parse_args():
     parser.add_argument("--device", type=int, default=0, help="device id, -1 for cpu")
     parser.add_argument("--models_names",type=str, nargs='+', help="model architectures you can enter one name model or list of models")
     parser.add_argument("--compare_models_names",type=str, default=None, nargs='+', help="model architectures vs who to compare with you can enter one name model or list of models",)
-    parser.add_argument("--output_path", type=str, default="./output")
+    parser.add_argument("--output_path", type=str, default="output")
     parser.add_argument("--CKA_type", type=str, nargs='+', default=["kernel_CKA"], choices = ["kernel_CKA", "linear_CKA"], help="kernel_CKA, linear_CKA")
     parser.add_argument("--layers_depth", type=int, nargs='+', help="you can enter -1 for max depth or specifie depth you want")
     parser.add_argument("--conv_only", type=int, default=0, help="use conv_only for the weights return")
@@ -64,8 +64,8 @@ def parse_args():
     
     if args.conv_only == 1 and len(args.kernel_size) == 1:
         args.kernel_size.append(args.kernel_size[0])
-    if args.length != len(args.pretrained):
-        args.pretrained = [args.pretrained[0]] * args.length
+    if args.length*2 != len(args.pretrained):
+        args.pretrained = [args.pretrained[0]] * args.length * 2
     if args.length != len(args.input_shape):
         args.input_shape = [args.input_shape[0]] * args.length
     if args.length != len(args.CKA_type):
@@ -97,22 +97,14 @@ def main():
     if args.dataset == "ImageNet" and not os.path.exists('./data/valid'):
         download_validation_ImagenNet(args)
     for i in range(args.length):
-        
-        if args.compare_models_names[i] == args.models_names[i]:
-            dataloader = import_dataloader(args, args.models_names[i], i)
-            output = find_feature_maps_for_model(args, args.models_names[i], i, dataloader)
-            CKA_matrix = run_CKA(args, cka, output, args.remove_output_layer)
-            del output
-        
-        else:
-            dataloader = import_dataloader(args, args.models_names[i], i)
-            output1 = find_feature_maps_for_model(args, args.models_names[i], i, dataloader)
-            del dataloader        
-            dataloader = import_dataloader(args, args.compare_models_names[i], i)
-            output2 = find_feature_maps_for_model(args, args.compare_models_names[i], i, dataloader)
+        dataloader = import_dataloader(args, args.models_names[i], i)
+        output1 = find_feature_maps_for_model(args, args.models_names[i], i, i*2, dataloader)
+        del dataloader        
+        dataloader = import_dataloader(args, args.compare_models_names[i], i)
+        output2 = find_feature_maps_for_model(args, args.compare_models_names[i], i, i*2+1, dataloader)
     
-            CKA_matrix = run_CKA_diff(args, cka, output1, output2, args.remove_output_layer)  
-            del output1, output2
+        CKA_matrix = run_CKA_diff(args, cka, output1, output2, args.remove_output_layer)  
+        del output1, output2
         
         heatmap_plot(args, CKA_matrix, i)
 

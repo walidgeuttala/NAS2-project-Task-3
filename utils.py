@@ -143,13 +143,23 @@ def run_CKA_diff(args, cka, mean_output, mean_output2, remove_output_layer=1):
 
     return CKA_matrix
 
-def find_feature_maps_for_model(args, model_name, i, dataloader):
+def find_feature_maps_for_model(args, model_name, i, idx, dataloader):
+
     if args.torchvision == 1:
+        if args.pretrained[idx] == 1:
+            args.pretrained[idx] = "IMAGENET1K_V1"
+        else:
+            args.pretrained[idx] = None
         model_path = getattr(torchvision.models, model_name)
-        model = model_path().to(args.device)
+        model = model_path(weights=args.pretrained[idx]).to(args.device)
     else:
-        model = pretrainedmodels.__dict__[model_name](num_classes=1000, pretrained='imagenet').to(args.device)
-        model.eval()
+        if args.pretrained[idx] == 1:
+            args.pretrained[idx] = 'imagenet'
+        else:
+            args.pretrained[idx] = None
+        model = pretrainedmodels.__dict__[model_name](num_classes=1000, pretrained=args.pretrained[idx]).to(args.device)
+    
+    model.eval()
     model_utils = ModelUtils(model, args.device, args.layers_depth[i], args.conv_only, args.kernel_size)
     if model_utils.max_layer_depth < args.layers_depth[i]:
         logging.warning(f'out of range layer depth for model with index {i} named : {model_name}')
@@ -171,7 +181,16 @@ def heatmap_plot(args, CKA_matrix, i):
     string = f"depth {args.layers_depth[i]} "
     if args.conv_only == 1:
         string = "conv_only "
-    title = string+f"{args.compare_models_names[i]} vs {args.models_names[i]}"    
+    if args.pretrained[2*i] != None:
+        args.pretrained[2*i] = "pretrained"
+    else:
+        args.pretrained[2*i] = "random_init"
+    if args.pretrained[2*i+1] != None:
+        args.pretrained[2*i+1] = "pretrained"
+    else:
+        args.pretrained[2*i+1] = "random_init"
+
+    title = string+f"{args.compare_models_names[i]} {args.pretrained[2*i]} vs {args.models_names[i]} {args.pretrained[2*i+1]}"    
     plt.title(title)
     plt.savefig(args.output_path+"/"+title+".png", bbox_inches='tight')
     # Display the plot
